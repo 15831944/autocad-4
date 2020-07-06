@@ -1,29 +1,17 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
-
 using Autodesk.AutoCAD.Runtime;
-
 using Autodesk.AutoCAD.Windows;
-
 using System;
-
 using System.Collections.Generic;
-
 using System.Drawing;
-
 using System.Reflection;
-
 using WinForms = System.Windows.Forms;
-
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+
 namespace autocad
-
 {
-
-    // The basic attribute we'll use to tag the methods/commands to place
-
-    // on the palette
     [AttributeUsage(AttributeTargets.Method)]
 
     public class PaletteMethod : Attribute { }
@@ -35,14 +23,7 @@ namespace autocad
 
         private static PaletteSet _ps = null;
 
-
-        // Our main command to display a palette. This is flagged to be included
-
-        // on the palette, too, which is a bit silly, but harmless (as the
-
-        // command doesn't do anything if the palette is already available)
-
-
+        private static object doc = Application.DocumentManager.MdiActiveDocument;
 
         [PaletteMethod]
 
@@ -55,8 +36,6 @@ namespace autocad
             if (_ps == null)
 
             {
-
-                var doc = Application.DocumentManager.MdiActiveDocument;
 
                 if (doc == null) return;
 
@@ -154,7 +133,6 @@ namespace autocad
 
 
 
-                //        var b = new WinForms.Button();
 
                 //        b.SetBounds(50, 40 * i, 100, 30);
 
@@ -301,100 +279,8 @@ namespace autocad
 
         }
 
-
-
-        // Helper function to display a message and post a command prompt
-
-        // (if there's an active document available)
-
-
-
-        private static void DisplayMessage(string str, bool postPrompt = true)
-
-        {
-
-            var doc = Application.DocumentManager.MdiActiveDocument;
-
-            if (doc == null) return;
-
-            doc.Editor.WriteMessage("\n{0}\n", str);
-
-            if (postPrompt)
-
-                doc.Editor.PostCommandPrompt();
-
-        }
-
-
-
-        // A bunch of test methods and a single proper AutoCAD command
-
-        // (it's a bit misleading to think of the
-
-        [PaletteMethod]
-
-        public void Method1()
-
-        {
-
-            DisplayMessage("Method 1");
-
-        }
-
-
-
-        [PaletteMethod]
-
-        public void Method2()
-
-        {
-
-            DisplayMessage("Method 2");
-
-        }
-
-
-
-        [PaletteMethod]
-
-        public void Method3()
-
-        {
-
-            DisplayMessage("Method 3");
-
-        }
-
-
-
-        [PaletteMethod]
-
-        public void Method4()
-
-        {
-
-            DisplayMessage("Method 4");
-
-        }
-
-
-
-        [PaletteMethod]
-
-        [CommandMethod("TEST")]
-
-        public static void CommandTest()
-
-        {
-
-            DisplayMessage("This is a command!", false);
-
-        }
-
-
         public void DrawProfileCommand(int lunghezza, int spessore)
         {
-            var doc = Application.DocumentManager.MdiActiveDocument;
             var db = doc.Database;
             var ed = doc.Editor;
 
@@ -424,6 +310,7 @@ namespace autocad
                 tr.Commit();
             }
         }
+        
         private Polyline DrawProfile(int lunghezza, int spessore)
         {
             var pline = new Polyline(10);
