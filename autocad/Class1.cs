@@ -23,7 +23,12 @@ namespace autocad
 
         private static PaletteSet _ps = null;
 
-        private static object doc = Application.DocumentManager.MdiActiveDocument;
+        private static Document doc = Application.DocumentManager.MdiActiveDocument;
+
+        private static Editor ed = doc.Editor;
+
+        private static Database db = doc.Database;
+
 
         [PaletteMethod]
 
@@ -39,226 +44,11 @@ namespace autocad
 
                 if (doc == null) return;
 
-                var ed = doc.Editor;
-
-
-
-                // We're going to take a look at the various methods in this module
-
-
+                doc.LockDocument();
 
                 var asm = Assembly.GetExecutingAssembly();
 
                 var type = asm.GetType("ModelessDialogs.Commands");
-
-                //if (type == null)
-
-                //{
-
-                //    ed.WriteMessage("\nCould not find the command class.");
-
-                //    return;
-
-                //}
-
-
-
-                // We'll create a sequence of buttons for each callable method
-
-
-
-                //var bs = new List<WinForms.Button>();
-
-                //var i = 1;
-
-
-
-                //// Loop over each method
-
-
-
-                //foreach (var m in type.GetMethods())
-
-                //{
-
-                //    var cmdName = "";
-
-                //    var palette = false;
-
-
-
-                //    // And then all of its attributes
-
-
-
-                //    foreach (var a in m.CustomAttributes)
-
-                //    {
-
-                //        // Check whether we have a command and/or a "palette" attb
-
-
-
-                //        if (a.AttributeType.Name == "CommandMethodAttribute")
-
-                //        {
-
-                //            cmdName = (string)a.ConstructorArguments[0].Value;
-
-                //        }
-
-                //        else if (a.AttributeType.Name == "PaletteMethod")
-
-                //        {
-
-                //            palette = true;
-
-                //        }
-
-                //    }
-
-
-
-                //    // If we have a palette attb, then one way or another it'll be
-
-                //    // added to the palette
-
-
-
-                //    if (palette)
-
-                //    {
-
-                //        // Create our button and give it a position
-
-
-
-
-                //        b.SetBounds(50, 40 * i, 100, 30);
-
-
-
-                //        // If no command name was found, use the method name and call the
-
-                //        // function directly in the session context
-
-
-
-                //        if (String.IsNullOrEmpty(cmdName))
-
-                //        {
-
-                //            b.Text = m.Name;
-
-                //            b.Click +=
-
-                //              (s, e) =>
-
-                //              {
-
-                //                  var b2 = (WinForms.Button)s;
-
-                //                  var mi = type.GetMethod(b2.Text);
-
-                //                  if (mi != null)
-
-                //                  {
-
-                //                      // Use reflection to call the method with no arguments
-
-
-
-                //                      mi.Invoke(this, null);
-
-                //                  }
-
-                //              };
-
-                //        }
-
-                //        else
-
-                //        {
-
-                //            // Otherwise we use the command name as the button text and
-
-                //            // execute the command in the command context asynchronously
-
-
-
-                //            b.Text = cmdName;
-
-                //            b.Click +=
-
-                //              async (s, e) =>
-
-                //              {
-
-                //                  var dm = Application.DocumentManager;
-
-                //                  var doc2 = dm.MdiActiveDocument;
-
-                //                  if (doc2 == null) return;
-
-
-
-                //                  // We could also use SendStringToExecute for older versions
-
-
-
-                //                  // doc2.SendStringToExecute(
-
-                //                  //   "_." + cmdName + " ", false, false, true
-
-                //                  // );
-
-
-
-                //                  var ed2 = doc2.Editor;
-
-
-
-                //                  await dm.ExecuteInCommandContextAsync(
-
-                //      async (obj) =>
-
-                //                  {
-
-                //                      await ed2.CommandAsync("_." + cmdName);
-
-                //                  },
-
-                //      null
-
-                //    );
-
-                //              };
-
-                //        }
-
-                //        bs.Add(b);
-
-                //        i++;
-
-                //    }
-
-                //}
-
-
-
-                //// Create a user control and add all our buttons to it
-
-
-
-                //var uc = new WinForms.UserControl();
-
-                //uc.Controls.AddRange(bs.ToArray());
-
-
-
-                // Create a palette set and add a palette containing our control
-
-
 
                 _ps = new PaletteSet("PC", new Guid("87374E16-C0DB-4F3F-9271-7A71ED921566"));
 
@@ -281,8 +71,6 @@ namespace autocad
 
         public void DrawProfileCommand(int lunghezza, int spessore)
         {
-            var db = doc.Database;
-            var ed = doc.Editor;
 
             var lunghezzaInt = lunghezza;
             var spessoreInt = spessore;
@@ -325,6 +113,93 @@ namespace autocad
             pline.Closed = true;
             return pline;
         }
+        
+        [CommandMethod("LockDoc", CommandFlags.Session)]
+        private void LockDoc()
+        {
+
+            // Create a new drawing
+
+            DocumentCollection acDocMgr = Application.DocumentManager;
+
+            Document acNewDoc = acDocMgr.Add("acad.dwt");
+
+            Database acDbNewDoc = acNewDoc.Database;
+
+
+
+            // Lock the new document
+
+            using (DocumentLock acLckDoc = acNewDoc.LockDocument())
+
+            {
+
+                // Start a transaction in the new database
+
+                using (Transaction acTrans = acDbNewDoc.TransactionManager.StartTransaction())
+
+                {
+
+                    // Open the Block table for read
+
+                    BlockTable acBlkTbl;
+
+                    acBlkTbl = acTrans.GetObject(acDbNewDoc.BlockTableId,
+
+                                                 OpenMode.ForRead) as BlockTable;
+
+
+
+                    // Open the Block table record Model space for write
+
+                    BlockTableRecord acBlkTblRec;
+
+                    acBlkTblRec = acTrans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+
+                                                    OpenMode.ForWrite) as BlockTableRecord;
+
+
+
+                    // Create a circle with a radius of 3 at 5,5
+
+                    Circle acCirc = new Circle();
+
+                    acCirc.SetDatabaseDefaults();
+
+                    acCirc.Center = new Point3d(5, 5, 0);
+
+                    acCirc.Radius = 3;
+
+
+
+                    // Add the new object to Model space and the transaction
+
+                    acBlkTblRec.AppendEntity(acCirc);
+
+                    acTrans.AddNewlyCreatedDBObject(acCirc, true);
+
+
+
+                    // Save the new object to the database
+
+                    acTrans.Commit();
+
+                }
+
+
+
+                // Unlock the document
+
+            }
+
+
+
+            // Set the new document current
+
+            acDocMgr.MdiActiveDocument = acNewDoc;
+
+        }
     }
+
 }
 

@@ -36,6 +36,9 @@
   <PropertyGroup>
     <ApplicationIcon>TextTemplate.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AcCoreMgd">
       <HintPath>..\..\..\..\..\..\ObjectARX_2017\inc\AcCoreMgd.dll</HintPath>
@@ -55,14 +58,17 @@
     </Reference>
     <Reference Include="AdWindows">
       <HintPath>..\..\..\..\..\..\ObjectARX_2017\inc\AdWindows.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Autodesk.AutoCAD.Interop">
       <HintPath>..\..\..\..\..\..\ObjectARX_2017\inc-x64\Autodesk.AutoCAD.Interop.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Autodesk.AutoCAD.Interop.Common">
       <HintPath>..\..\..\..\..\..\ObjectARX_2017\inc-x64\Autodesk.AutoCAD.Interop.Common.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

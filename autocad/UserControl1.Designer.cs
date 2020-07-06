@@ -39,9 +39,9 @@
             // 
             this.Lunghezza_input.AccessibleDescription = "L";
             this.Lunghezza_input.AccessibleName = "L";
-            this.Lunghezza_input.Location = new System.Drawing.Point(111, 66);
+            this.Lunghezza_input.Location = new System.Drawing.Point(113, 66);
             this.Lunghezza_input.Name = "Lunghezza_input";
-            this.Lunghezza_input.Size = new System.Drawing.Size(30, 20);
+            this.Lunghezza_input.Size = new System.Drawing.Size(25, 20);
             this.Lunghezza_input.TabIndex = 4;
             this.Lunghezza_input.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
             // 
@@ -58,7 +58,7 @@
             // button2
             // 
             this.button2.Image = global::autocad.Properties.Resources.PickPoint;
-            this.button2.Location = new System.Drawing.Point(150, 182);
+            this.button2.Location = new System.Drawing.Point(149, 166);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(35, 36);
             this.button2.TabIndex = 6;
@@ -69,9 +69,9 @@
             // 
             this.Spessore_input.AccessibleDescription = "s";
             this.Spessore_input.AccessibleName = "s";
-            this.Spessore_input.Location = new System.Drawing.Point(53, 94);
+            this.Spessore_input.Location = new System.Drawing.Point(62, 93);
             this.Spessore_input.Name = "Spessore_input";
-            this.Spessore_input.Size = new System.Drawing.Size(30, 20);
+            this.Spessore_input.Size = new System.Drawing.Size(20, 20);
             this.Spessore_input.TabIndex = 8;
             this.Spessore_input.Tag = "Spessore";
             this.Spessore_input.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
@@ -86,7 +86,7 @@
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.button2);
             this.Name = "UserControl1";
-            this.Size = new System.Drawing.Size(350, 295);
+            this.Size = new System.Drawing.Size(249, 295);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
