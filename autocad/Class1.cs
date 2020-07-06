@@ -14,6 +14,9 @@ using System.Reflection;
 
 using WinForms = System.Windows.Forms;
 
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
 namespace autocad
 
 {
@@ -21,9 +24,6 @@ namespace autocad
     // The basic attribute we'll use to tag the methods/commands to place
 
     // on the palette
-
-
-
     [AttributeUsage(AttributeTargets.Method)]
 
     public class PaletteMethod : Attribute { }
@@ -31,11 +31,9 @@ namespace autocad
 
 
     public class Commands
-
     {
 
         private static PaletteSet _ps = null;
-
 
 
         // Our main command to display a palette. This is flagged to be included
@@ -48,7 +46,7 @@ namespace autocad
 
         [PaletteMethod]
 
-        [CommandMethod("PC")]
+        [CommandMethod("asola")]
 
         public void PaletteCcommands()
 
@@ -393,7 +391,53 @@ namespace autocad
 
         }
 
-    }
 
+        public void DrawProfileCommand(int lunghezza, int spessore)
+        {
+            var doc = Application.DocumentManager.MdiActiveDocument;
+            var db = doc.Database;
+            var ed = doc.Editor;
+
+            var lunghezzaInt = lunghezza;
+            var spessoreInt = spessore;
+
+            //var spessore = ed.GetPoint("\nIserisci spessore: ");
+            //var lunghezza = ed.GetPoint("\nInserisci lunghezza: ");
+            var pbase = ed.GetPoint("\nPunto base: ");
+
+            //Point3d ancora = new Point3d(pbase.Value.X - (lunghezzaInt / 2), pbase.Value.Y - (spessoreInt/2), 0); 
+            Point3d ancora = new Point3d(pbase.Value.X - ((lunghezzaInt / 2) - (spessoreInt / 2)), pbase.Value.Y - (spessoreInt / 2), 0);
+
+            using (var tr = db.TransactionManager.StartTransaction())
+            {
+                var curSpace = (BlockTableRecord)tr.GetObject(db.CurrentSpaceId, OpenMode.ForWrite);
+                using (var pline = DrawProfile(lunghezzaInt, spessoreInt))
+                {
+                    // transform the polyline about current coordinate system and specified instertion point
+                    pline.TransformBy(ed.CurrentUserCoordinateSystem * Matrix3d.Displacement(ancora.GetAsVector()));
+                    // append the polyline to the current space
+                    curSpace.AppendEntity(pline);
+                    // add the polyline to the transaction
+                    tr.AddNewlyCreatedDBObject(pline, true);
+                }
+                // save the changes to the database
+                tr.Commit();
+            }
+        }
+        private Polyline DrawProfile(int lunghezza, int spessore)
+        {
+            var pline = new Polyline(10);
+            var pt = Point2d.Origin;
+            pline.AddVertexAt(0, pt, 0.0, 0.0, 0.0);
+            pt += new Vector2d(lunghezza - spessore, 0.0);
+            pline.AddVertexAt(1, pt, 1, 0.0, 0.0);
+            pt += new Vector2d(0.0, spessore);
+            pline.AddVertexAt(2, pt, 0.0, 0.0, 0.0);
+            pt += new Vector2d(-(lunghezza - spessore), 0);
+            pline.AddVertexAt(3, pt, 1, 0.0, 0.0);
+            pline.Closed = true;
+            return pline;
+        }
+    }
 }
 

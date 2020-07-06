@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Autodesk.Private.InfoCenter;
+using Autodesk.AutoCAD.Windows.Data;
 
 namespace autocad
 {
@@ -33,9 +34,10 @@ namespace autocad
             string lunghezza = Lunghezza_input.Text;
 
             // * System.Diagnostics.Debug.WriteLine(e);
-            if (string.IsNullOrEmpty(spessore) || string.IsNullOrEmpty(lunghezza))
+            if (!string.IsNullOrEmpty(spessore) || !string.IsNullOrEmpty(lunghezza))
             {
-                // richiedi l'inserimento del punto base
+                var asola = new Commands();
+                asola.DrawProfileCommand(int.Parse(lunghezza), int.Parse(spessore));
             }
         }
 
